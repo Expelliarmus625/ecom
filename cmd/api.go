@@ -6,6 +6,7 @@ import (
 	"time"
 
 	repo "github.com/expelliarmus625/ecom/internal/adapters/postgresql/sqlc"
+	"github.com/expelliarmus625/ecom/internal/orders"
 	"github.com/expelliarmus625/ecom/internal/products"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -29,7 +30,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Recoverer)
 
 	r.Use(middleware.Timeout(60 * time.Second)) //timeout after 60 seconds. TODO: Set timeout from config
-	
+
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request){
 		w.Write([]byte("I'm alive"))
 	})
@@ -39,8 +40,17 @@ func (app *application) mount() http.Handler {
 	r.Get("/products", productHandler.ListProducts)
 	r.Get("/products/{id}", productHandler.FindProductByID)
 
-	// http.ListenAndServe(app.config.addr, r)
-	return r
+
+	orderService := orders.NewService(repo.New(app.db), app.db)
+	orderHandler := orders.NewHandler(orderService)
+	r.Get("/orders", orderHandler.ListOrders)
+	r.Get("/orders/{id}", orderHandler.ListOrderItems)
+	r.Post("/orders", orderHandler.PlaceOrder)
+
+
+	baseRouter := chi.NewRouter()
+	baseRouter.Mount("/ecom/v1", r)
+	return baseRouter
 }
 
 

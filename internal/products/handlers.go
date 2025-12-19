@@ -43,3 +43,4 @@ func (h *Handler) FindProductByID(w http.ResponseWriter, r *http.Request) {
 
 	json.Write(w, product, http.StatusOK)
 }
+
