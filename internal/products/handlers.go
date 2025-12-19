@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/expelliarmus625/ecom/internal/json"
+	"github.com/go-chi/chi/v5"
 )
 
 type Handler struct{
@@ -30,8 +31,10 @@ func (h *Handler) ListProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) FindProductByID(w http.ResponseWriter, r *http.Request) {	
+	id := chi.URLParam(r, "id")
 
-  product, err := h.service.FindProductByID(r.Context()) 
+	log.Default().Printf("%s", id)
+  product, err := h.service.FindProductByID(r.Context(), id)
 	if err != nil{
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

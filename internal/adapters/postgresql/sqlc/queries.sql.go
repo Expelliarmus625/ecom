@@ -10,7 +10,12 @@ import (
 )
 
 const findProductByID = `-- name: FindProductByID :one
-SELECT id, name, price_in_cents, quantity, created_at FROM products WHERE id = $1
+SELECT 
+  id, name, price_in_cents, quantity, created_at 
+FROM 
+  products 
+WHERE 
+  id = $1
 `
 
 func (q *Queries) FindProductByID(ctx context.Context, id int64) (Product, error) {
